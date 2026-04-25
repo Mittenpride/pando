@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags -->
+  <title>Acquisition Valuation Calculator | Pando Collective</title>
+  <meta name="title" content="Acquisition Valuation Calculator | Pando Collective">
+  <meta name="description" content="Estimate the acquisition value of a vacation rental management company using Pando Collective's scoring framework. Internal tool.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://pandocollective.com/valuation-calculator/">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#F2B21A">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════
+       PANDO COLLECTIVE — SITE DESIGN SYSTEM
+       Matches pandocollective.com exactly
+    ═══════════════════════════════════════ */
+
+    :root {
+      --color-aspen-gold:    #F2B21A;
+      --color-charcoal:      #434341;
+      --color-aspen-white:   #FAF7F2;
+      --color-mountain-slate:#4A5A6A;
+      --color-white:         #ffffff;
+
+      --font-sans: "Work Sans", "Helvetica Neue", Arial, sans-serif;
+      --fw-regular: 400;
+      --fw-medium:  500;
+      --fw-bold:    700;
+
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 2rem;
+      --space-xl: 4rem;
+
+      --radius-sm: 2px;
+      --radius-md: 4px;
+
+      /* Status palette */
+      --c-poor:     #B83232;
+      --c-poor-bg:  rgba(184,50,50,0.09);
+      --c-ok:       #B07018;
+      --c-ok-bg:    rgba(176,112,24,0.09);
+      --c-fair:     #7A5A00;
+      --c-fair-bg:  rgba(242,178,26,0.13);
+      --c-good:     #2A6E48;
+      --c-good-bg:  rgba(42,110,72,0.11);
+      --c-excel:    #1A5280;
+      --c-excel-bg: rgba(26,82,128,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-aspen-white);
+      color: var(--color-charcoal);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV (matches site nav exactly) ── */
+    .nav {
+      background: var(--color-white);
+      border-bottom: 1px solid rgba(67,67,65,0.12);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav__logo { display: flex; align-items: center; text-decoration: none; }
+    .nav__logo-icon { height: 40px; width: auto; }
+
+    .nav__menu {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav__link {
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: var(--fw-medium);
+      color: var(--color-charcoal);
+      letter-spacing: 0.01em;
+      transition: color 0.15s;
+    }
+
+    .nav__link:hover { color: var(--color-aspen-gold); }
+
+    .nav__toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .nav__toggle-line {
+      width: 24px;
+      height: 2px;
+      background: var(--color-charcoal);
+      border-radius: 1px;
+    }
+
+    @media (max-width: 768px) {
+      .nav__toggle { display: flex; }
+      .nav__menu {
+        display: none;
+        position: absolute;
+        top: 72px;
+        left: 0; right: 0;
+        background: var(--color-white);
+        flex-direction: column;
+        padding: 1.5rem 2rem;
+        gap: 1.25rem;
+        border-bottom: 1px solid rgba(67,67,65,0.12);
+        z-index: 99;
+      }
+      .nav__menu.active { display: flex; }
+    }
+
+    /* ── HERO SECTION (matches site section--hero) ── */
+    .section--hero {
+      background: var(--color-charcoal);
+      padding: 4rem 2rem 4.5rem;
+      border-bottom: 3px solid var(--color-aspen-gold);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .hero__subtitle {
+      font-size: 0.75rem;
+      font-weight: var(--fw-bold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-aspen-gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero__title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: var(--fw-bold);
+      color: var(--color-aspen-white);
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      max-width: 660px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .hero__title-leaf {
+      height: 52px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .hero__description {
+      margin-top: 1rem;
+      font-size: 1.05rem;
+      color: rgba(250,247,242,0.60);
+      max-width: 560px;
+      line-height: 1.65;
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding: var(--space-xl) 0;
+    }
+
+    /* ── SUBTITLE LABEL (matches .subtitle on site) ── */
+    .subtitle {
+      font-size: 0.75rem;
+      font-weight: var(--fw-bold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-aspen-gold);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── TOOL LAYOUT ── */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .tool-grid { grid-template-columns: 1fr; }
+      .result-sticky { position: static !important; }
+    }
+
+    .result-sticky {
+      position: sticky;
+      top: 88px;
+    }
+
+    /* ── CARD (matches site .card) ── */
+    .card {
+      background: var(--color-white);
+      border: 1px solid rgba(67,67,65,0.10);
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .card:last-child { margin-bottom: 0; }
+
+    .card__header {
+      background: var(--color-charcoal);
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card__header-title {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      color: var(--color-aspen-white);
+    }
+
+    .card__header-tag {
+      font-size: 0.60rem;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      padding: 0.15rem 0.5rem;
+      border-radius: 1px;
+    }
+
+    .tag-rev  { color: var(--color-aspen-gold); border: 1px solid rgba(242,178,26,0.35); background: rgba(242,178,26,0.10); }
+    .tag-deal { color: rgba(250,247,242,0.40);  border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.05); }
+
+    .card__body { padding: 1.75rem; }
+
+    /* ── FORM FIELDS ── */
+    .field { margin-bottom: 1.5rem; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field__label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: var(--fw-bold);
+      color: var(--color-charcoal);
+      margin-bottom: 0.3rem;
+    }
+
+    .field__label span {
+      font-weight: var(--fw-regular);
+      font-size: 0.72rem;
+      color: var(--color-mountain-slate);
+      margin-left: 0.35rem;
+    }
+
+    .field__desc {
+      font-size: 0.73rem;
+      color: var(--color-mountain-slate);
+      margin-bottom: 0.55rem;
+      line-height: 1.55;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap .adorn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.88rem;
+      font-weight: var(--fw-medium);
+      color: rgba(67,67,65,0.45);
+      pointer-events: none;
+    }
+
+    .adorn-l { left: 0.8rem; }
+    .adorn-r { right: 0.8rem; }
+
+    input[type="number"] {
+      width: 100%;
+      height: 44px;
+      padding: 0 0.875rem;
+      border: 1.5px solid rgba(67,67,65,0.22);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: var(--fw-medium);
+      color: var(--color-charcoal);
+      background: var(--color-aspen-white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--color-aspen-gold);
+      box-shadow: 0 0 0 3px rgba(242,178,26,0.20);
+    }
+
+    .has-l input { padding-left: 1.65rem; }
+    .has-r input { padding-right: 1.65rem; }
+
+    /* Calculated display */
+    .calc-display {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 0.875rem;
+      border: 1.5px solid rgba(242,178,26,0.35);
+      border-radius: var(--radius-sm);
+      background: rgba(242,178,26,0.08);
+      font-size: 0.95rem;
+      font-weight: var(--fw-bold);
+      color: var(--color-charcoal);
+    }
+
+    .calc-display.empty {
+      color: rgba(67,67,65,0.30);
+      font-weight: var(--fw-regular);
+      font-size: 0.85rem;
+    }
+
+    /* Inline badge */
+    .ibadge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.66rem;
+      font-weight: var(--fw-bold);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border-radius: 1px;
+    }
+
+    .ib-poor  { background: var(--c-poor-bg);  color: var(--c-poor); }
+    .ib-ok    { background: var(--c-ok-bg);    color: var(--c-ok); }
+    .ib-fair  { background: var(--c-fair-bg);  color: var(--c-fair); }
+    .ib-good  { background: var(--c-good-bg);  color: var(--c-good); }
+    .ib-excel { background: var(--c-excel-bg); color: var(--c-excel); }
+
+    .helper {
+      font-size: 0.70rem;
+      color: var(--color-mountain-slate);
+      margin-top: 0.4rem;
+      line-height: 1.5;
+    }
+
+    /* ── DIVIDER (matches site hr style) ── */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(67,67,65,0.10);
+      margin: 1.5rem 0;
+    }
+
+    /* ── RADIO OPTION GRID ── */
+    .radio-grid {
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .radio-grid.c2 { grid-template-columns: 1fr 1fr; }
+    .radio-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+    .radio-grid.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    @media (max-width: 600px) {
+      .radio-grid.c4 { grid-template-columns: 1fr 1fr; }
+      .radio-grid.c3 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .radio-opt { position: relative; }
+
+    .radio-opt input[type="radio"] {
+      position: absolute; opacity: 0; width: 0; height: 0;
+    }
+
+    .radio-opt label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+      padding: 0.6rem 0.4rem;
+      border: 1.5px solid rgba(67,67,65,0.20);
+      border-radius: var(--radius-sm);
+      background: var(--color-aspen-white);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.13s, background 0.13s;
+    }
+
+    .radio-opt label .opt-main {
+      font-size: 0.78rem;
+      font-weight: var(--fw-bold);
+      color: rgba(67,67,65,0.55);
+      line-height: 1.2;
+    }
+
+    .radio-opt label .opt-sub {
+      font-size: 0.62rem;
+      font-weight: var(--fw-medium);
+      color: rgba(67,67,65,0.35);
+      margin-top: 0.2rem;
+      line-height: 1.3;
+    }
+
+    /* Unchecked hover */
+    .radio-opt label:hover {
+      border-color: var(--color-aspen-gold);
+    }
+
+    /* Checked — default charcoal */
+    .radio-opt input:checked + label {
+      border-color: var(--color-charcoal);
+      background: var(--color-charcoal);
+    }
+    .radio-opt input:checked + label .opt-main { color: var(--color-aspen-white); }
+    .radio-opt input:checked + label .opt-sub  { color: rgba(250,247,242,0.45); }
+
+    /* Checked — status tinted */
+    .ropt-poor  input:checked + label { border-color: var(--c-poor);  background: var(--c-poor); }
+    .ropt-ok    input:checked + label { border-color: var(--c-ok);    background: var(--c-ok); }
+    .ropt-fair  input:checked + label { border-color: #8A6400;        background: #8A6400; }
+    .ropt-good  input:checked + label { border-color: var(--c-good);  background: var(--c-good); }
+    .ropt-excel input:checked + label { border-color: var(--c-excel); background: var(--c-excel); }
+
+    /* ── RESULT CARD ── */
+    .result-card {
+      background: var(--color-charcoal);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .result-band {
+      background: var(--color-aspen-gold);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .result-band__label {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      color: var(--color-charcoal);
+    }
+
+    .result-band__leaf {
+      height: 28px;
+      width: auto;
+    }
+
+    .result-body { padding: 1.5rem; }
+
+    .result-number {
+      font-size: clamp(2rem, 5vw, 2.9rem);
+      font-weight: var(--fw-bold);
+      color: var(--color-aspen-white);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .result-multiple {
+      font-size: 0.82rem;
+      color: var(--color-aspen-gold);
+      font-weight: var(--fw-medium);
+      margin-top: 0.25rem;
+    }
+
+    .result-range {
+      font-size: 0.75rem;
+      color: rgba(250,247,242,0.38);
+      margin-top: 0.15rem;
+    }
+
+    .result-sep {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 1.1rem 0;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.55rem;
+      font-size: 0.82rem;
+    }
+
+    .result-row:last-child { margin-bottom: 0; }
+    .result-row__lbl { color: rgba(250,247,242,0.42); font-weight: var(--fw-medium); }
+    .result-row__val { color: var(--color-aspen-white); font-weight: var(--fw-bold); }
+
+    /* Score meter */
+    .meter-wrap { margin: 1rem 0; }
+
+    .meter-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.62rem;
+      color: rgba(250,247,242,0.28);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+    }
+
+    .meter-track {
+      height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.35s ease, background-color 0.35s ease;
+    }
+
+    /* Factor tiles */
+    .factor-section-lbl {
+      font-size: 0.60rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      color: rgba(250,247,242,0.28);
+      margin-bottom: 0.5rem;
+    }
+
+    .factor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+
+    .ftile {
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.65rem;
+    }
+
+    .ftile__lbl {
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      opacity: 0.55;
+      margin-bottom: 0.2rem;
+    }
+
+    .ftile__val {
+      font-size: 0.74rem;
+      font-weight: var(--fw-bold);
+    }
+
+    .ft-neutral { background: rgba(255,255,255,0.05); }
+    .ft-neutral .ftile__lbl { color: rgba(250,247,242,0.35); }
+    .ft-neutral .ftile__val { color: rgba(250,247,242,0.55); }
+
+    .ft-poor { background: rgba(184,50,50,0.18); }
+    .ft-poor .ftile__lbl, .ft-poor .ftile__val { color: #DE7070; }
+
+    .ft-ok { background: rgba(176,112,24,0.18); }
+    .ft-ok .ftile__lbl, .ft-ok .ftile__val { color: #DEA040; }
+
+    .ft-fair { background: rgba(242,178,26,0.13); }
+    .ft-fair .ftile__lbl, .ft-fair .ftile__val { color: var(--color-aspen-gold); }
+
+    .ft-good { background: rgba(42,110,72,0.20); }
+    .ft-good .ftile__lbl, .ft-good .ftile__val { color: #6FCE98; }
+
+    .ft-excel { background: rgba(26,82,128,0.20); }
+    .ft-excel .ftile__lbl, .ft-excel .ftile__val { color: #7AB8E0; }
+
+    /* Verdict bar */
+    .verdict {
+      margin-top: 1rem;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .verdict__eyebrow {
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      opacity: 0.50;
+      margin-bottom: 0.2rem;
+    }
+
+    .verdict__label {
+      font-size: 1.05rem;
+      font-weight: var(--fw-bold);
+      letter-spacing: -0.01em;
+    }
+
+    .verdict__mult-num {
+      font-size: 1.5rem;
+      font-weight: var(--fw-bold);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-align: right;
+    }
+
+    .verdict__mult-sub {
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.45;
+      text-align: right;
+      margin-top: 0.15rem;
+    }
+
+    .v-poor  { background: rgba(184,50,50,0.20);  color: #DE7070; }
+    .v-ok    { background: rgba(176,112,24,0.20); color: #DEA040; }
+    .v-fair  { background: rgba(242,178,26,0.15); color: var(--color-aspen-gold); }
+    .v-good  { background: rgba(42,110,72,0.22);  color: #6FCE98; }
+    .v-excel { background: rgba(26,82,128,0.22);  color: #7AB8E0; }
+
+    /* Placeholder */
+    .placeholder {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      color: rgba(250,247,242,0.22);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .placeholder img {
+      height: 48px;
+      width: auto;
+      opacity: 0.18;
+      display: block;
+      margin: 0 auto 0.75rem;
+    }
+
+    /* Method note */
+    .method-note {
+      background: var(--color-white);
+      border: 1px solid rgba(67,67,65,0.10);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .method-note__title {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      color: var(--color-charcoal);
+      opacity: 0.38;
+      margin-bottom: 0.5rem;
+    }
+
+    .method-note p {
+      font-size: 0.73rem;
+      line-height: 1.65;
+      color: var(--color-mountain-slate);
+    }
+
+    /* ── FOOTER (matches site footer exactly) ── */
+    .footer {
+      background: var(--color-charcoal);
+      padding: 3rem 0 2rem;
+      margin-top: 4rem;
+    }
+
+    .footer__content {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .footer__content { grid-template-columns: 1fr; }
+    }
+
+    .footer__logo-image {
+      height: 32px;
+      width: auto;
+      margin-bottom: 1rem;
+      filter: brightness(0) invert(1);
+      opacity: 0.85;
+    }
+
+    .footer__tagline {
+      font-size: 0.82rem;
+      color: rgba(250,247,242,0.45);
+      line-height: 1.6;
+    }
+
+    .footer__title {
+      font-size: 0.70rem;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      font-weight: var(--fw-bold);
+      color: rgba(250,247,242,0.40);
+      margin-bottom: 1rem;
+    }
+
+    .footer__links { list-style: none; }
+
+    .footer__link {
+      display: block;
+      text-decoration: none;
+      font-size: 0.85rem;
+      color: rgba(250,247,242,0.60);
+      margin-bottom: 0.6rem;
+      transition: color 0.15s;
+    }
+
+    .footer__link:hover { color: var(--color-aspen-gold); }
+
+    .footer__bottom {
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.75rem;
+      color: rgba(250,247,242,0.28);
+    }
+
+    /* ── UTILITY ── */
+    .mb-lg { margin-bottom: var(--space-lg); }
+    .text-center { text-align: center; }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAVIGATION (matches site exactly) ══ -->
+<nav class="nav">
+  <div class="nav__container">
+    <a href="/" class="nav__logo">
+      <img src="https://pandocollective.com/pando-horizontal-charcoal.png"
+           alt="Pando Collective"
+           class="nav__logo-icon"
+           onerror="this.src='/pando-horizontal-charcoal.png'">
+    </a>
+    <button class="nav__toggle" aria-label="Toggle menu">
+      <span class="nav__toggle-line"></span>
+      <span class="nav__toggle-line"></span>
+      <span class="nav__toggle-line"></span>
+    </button>
+    <ul class="nav__menu">
+      <li><a href="/property-management.html" class="nav__link">For Operators</a></li>
+      <li><a href="/partner-with-us.html" class="nav__link">Partner With Us</a></li>
+      <li><a href="/about-us.html" class="nav__link">About</a></li>
+      <li><a href="/contact-us.html" class="nav__link">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="section--hero">
+  <div class="container">
+    <p class="hero__subtitle">Acquisition Analysis</p>
+    <h1 class="hero__title">
+      <img src="https://pandocollective.com/pando-leaf-gold.png"
+           class="hero__title-leaf"
+           alt="">
+      Operator Valuation Calculator
+    </h1>
+    <p class="hero__description">
+      Score an operator across eight quality criteria to calculate an estimated acquisition value.
+      Designed for VRM businesses with &lt;$500K SDE — typical range 1.25&times;–1.75&times; commissionable revenue.
+    </p>
+  </div>
+</section>
+
+<!-- ══ TOOL BODY ══ -->
+<section class="section">
+  <div class="container">
+    <div class="tool-grid">
+
+      <!-- ── LEFT: INPUTS ── -->
+      <div>
+
+        <!-- REVENUE QUALITY -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__header-title">Revenue Quality</span>
+            <span class="card__header-tag tag-rev">Factors 1 – 5</span>
+          </div>
+          <div class="card__body">
+
+            <!-- 1. Total Annual Rent -->
+            <div class="field">
+              <label class="field__label" for="totalRent">Total Annual Rent</label>
+              <div class="field__desc">Gross rental revenue across all managed properties</div>
+              <div class="input-wrap has-l">
+                <span class="adorn adorn-l">$</span>
+                <input type="number" id="totalRent" placeholder="0" min="0" step="5000" oninput="runValuation()">
+              </div>
+            </div>
+
+            <!-- 2. Units -->
+            <div class="field">
+              <label class="field__label" for="units">Units Under Management</label>
+              <div class="field__desc">Total number of active properties managed</div>
+              <div class="input-wrap">
+                <input type="number" id="units" placeholder="0" min="0" step="1" oninput="runValuation()">
+              </div>
+            </div>
+
+            <!-- 3. Rev per unit — calculated -->
+            <div class="field">
+              <label class="field__label">Revenue Per Unit <span>calculated</span></label>
+              <div class="calc-display empty" id="revPerUnit">Enter rent &amp; units above</div>
+              <div class="helper">Benchmark: &lt;$15K weak &middot; $15–$25K average &middot; &gt;$25K strong</div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- 4. Commission Split -->
+            <div class="field">
+              <label class="field__label" for="commission">Commission Split</label>
+              <div class="field__desc">Management fee as a percentage of gross rent</div>
+              <div class="input-wrap has-r">
+                <span class="adorn adorn-r">%</span>
+                <input type="number" id="commission" placeholder="0" min="0" max="60" step="0.5" oninput="runValuation()">
+              </div>
+              <div id="commBadge" style="margin-top:0.45rem; min-height:1.1rem; font-size:0.75rem; color:var(--color-mountain-slate);"></div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- 5. Revenue Trend -->
+            <div class="field" style="margin-bottom:0;">
+              <label class="field__label">Multi-Year Revenue Trend</label>
+              <div class="field__desc">Direction of commissionable revenue over the past 2–3 years</div>
+              <div class="radio-grid c3">
+                <div class="radio-opt ropt-poor">
+                  <input type="radio" name="revTrend" id="rtDecline" value="poor" onchange="runValuation()">
+                  <label for="rtDecline">
+                    <span class="opt-main">Declining</span>
+                    <span class="opt-sub">Year-over-year drop</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-ok">
+                  <input type="radio" name="revTrend" id="rtFlat" value="ok" onchange="runValuation()" checked>
+                  <label for="rtFlat">
+                    <span class="opt-main">Flat</span>
+                    <span class="opt-sub">Stable, &lt;5% change</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-good">
+                  <input type="radio" name="revTrend" id="rtGrow" value="good" onchange="runValuation()">
+                  <label for="rtGrow">
+                    <span class="opt-main">Increasing</span>
+                    <span class="opt-sub">Consistent growth</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- DEAL QUALITY -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__header-title">Deal Quality</span>
+            <span class="card__header-tag tag-deal">Factors 6 – 10</span>
+          </div>
+          <div class="card__body">
+
+            <!-- 6. Contract Assignability -->
+            <div class="field">
+              <label class="field__label">Contract Assignability</label>
+              <div class="field__desc">Can owner contracts transfer to an acquiring entity without re-signing?</div>
+              <div class="radio-grid c3">
+                <div class="radio-opt ropt-good">
+                  <input type="radio" name="assignability" id="aYes" value="good" onchange="runValuation()">
+                  <label for="aYes">
+                    <span class="opt-main">Yes</span>
+                    <span class="opt-sub">Clean transfer</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-ok">
+                  <input type="radio" name="assignability" id="aUnk" value="ok" onchange="runValuation()" checked>
+                  <label for="aUnk">
+                    <span class="opt-main">Unknown</span>
+                    <span class="opt-sub">Not yet verified</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-poor">
+                  <input type="radio" name="assignability" id="aNo" value="poor" onchange="runValuation()">
+                  <label for="aNo">
+                    <span class="opt-main">No</span>
+                    <span class="opt-sub">Requires re-sign</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- 7. Owner Concentration -->
+            <div class="field">
+              <label class="field__label">Owner Concentration</label>
+              <div class="field__desc">Largest single owner's share of total managed revenue</div>
+              <div class="radio-grid c2">
+                <div class="radio-opt ropt-excel">
+                  <input type="radio" name="ownerConc" id="ocE" value="excellent" onchange="runValuation()">
+                  <label for="ocE">
+                    <span class="opt-main">All &lt;5%</span>
+                    <span class="opt-sub">Excellent — no key-owner risk</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-good">
+                  <input type="radio" name="ownerConc" id="ocG" value="good" onchange="runValuation()" checked>
+                  <label for="ocG">
+                    <span class="opt-main">5%–10%</span>
+                    <span class="opt-sub">Good — modest concentration</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-ok">
+                  <input type="radio" name="ownerConc" id="ocO" value="ok" onchange="runValuation()">
+                  <label for="ocO">
+                    <span class="opt-main">10%–20%</span>
+                    <span class="opt-sub">Ok — notable exposure</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-poor">
+                  <input type="radio" name="ownerConc" id="ocP" value="poor" onchange="runValuation()">
+                  <label for="ocP">
+                    <span class="opt-main">≥ 20%</span>
+                    <span class="opt-sub">Poor — high key-owner risk</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- 8. Operator Dependency -->
+            <div class="field">
+              <label class="field__label">Operator Dependency</label>
+              <div class="field__desc">Does the business run without the current owner, or are relationships tied to them personally?</div>
+              <div class="radio-grid c3">
+                <div class="radio-opt ropt-poor">
+                  <input type="radio" name="opDep" id="odH" value="poor" onchange="runValuation()">
+                  <label for="odH">
+                    <span class="opt-main">High</span>
+                    <span class="opt-sub">Owner is the business</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-fair">
+                  <input type="radio" name="opDep" id="odM" value="fair" onchange="runValuation()" checked>
+                  <label for="odM">
+                    <span class="opt-main">Medium</span>
+                    <span class="opt-sub">Some key-person risk</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-good">
+                  <input type="radio" name="opDep" id="odL" value="good" onchange="runValuation()">
+                  <label for="odL">
+                    <span class="opt-main">Low</span>
+                    <span class="opt-sub">Ops team in place</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- 9. Contract Notice Period -->
+            <div class="field">
+              <label class="field__label">Contract Notice / Term</label>
+              <div class="field__desc">How much notice can owners give to exit their management agreement?</div>
+              <div class="radio-grid c4">
+                <div class="radio-opt ropt-poor">
+                  <input type="radio" name="noticePeriod" id="np30" value="poor" onchange="runValuation()">
+                  <label for="np30">
+                    <span class="opt-main">≤ 30-day</span>
+                    <span class="opt-sub">High churn risk</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-ok">
+                  <input type="radio" name="noticePeriod" id="np60" value="ok" onchange="runValuation()" checked>
+                  <label for="np60">
+                    <span class="opt-main">60-day</span>
+                    <span class="opt-sub">Standard</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-fair">
+                  <input type="radio" name="noticePeriod" id="np90" value="fair" onchange="runValuation()">
+                  <label for="np90">
+                    <span class="opt-main">90-day</span>
+                    <span class="opt-sub">Good protection</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-good">
+                  <input type="radio" name="noticePeriod" id="np180" value="good" onchange="runValuation()">
+                  <label for="np180">
+                    <span class="opt-main">6mo+ / Term</span>
+                    <span class="opt-sub">Strong</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- 10. Channel Diversification -->
+            <div class="field" style="margin-bottom:0;">
+              <label class="field__label">Channel Diversification</label>
+              <div class="field__desc">How diversified is the booking channel mix?</div>
+              <div class="radio-grid c3">
+                <div class="radio-opt ropt-poor">
+                  <input type="radio" name="channels" id="chS" value="poor" onchange="runValuation()">
+                  <label for="chS">
+                    <span class="opt-main">Single OTA</span>
+                    <span class="opt-sub">Airbnb or VRBO only</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-fair">
+                  <input type="radio" name="channels" id="chM" value="fair" onchange="runValuation()" checked>
+                  <label for="chM">
+                    <span class="opt-main">Multi-OTA</span>
+                    <span class="opt-sub">2+ platforms</span>
+                  </label>
+                </div>
+                <div class="radio-opt ropt-good">
+                  <input type="radio" name="channels" id="chD" value="good" onchange="runValuation()">
+                  <label for="chD">
+                    <span class="opt-main">Direct + OTAs</span>
+                    <span class="opt-sub">Diversified mix</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+      <!-- end left column -->
+
+      <!-- ── RIGHT: RESULT PANEL ── -->
+      <div class="result-sticky">
+
+        <div class="result-card">
+          <div class="result-band">
+            <span class="result-band__label">Acquisition Valuation</span>
+            <img src="https://pandocollective.com/pando-leaf-charcoal.png"
+                 class="result-band__leaf"
+                 alt="">
+          </div>
+
+          <div class="result-body" id="resultBody">
+            <div class="placeholder">
+              <img src="https://pandocollective.com/pando-leaf-gold.png" alt="">
+              Enter the info on the left<br>to generate a valuation.
+            </div>
+          </div>
+        </div>
+
+        <!-- Methodology note -->
+        <div class="method-note">
+          <div class="method-note__title">Methodology</div>
+          <p>Valuation&nbsp;=&nbsp;Commissionable Revenue &times; Scored Multiple (1.25&times;–1.75&times;). Ten criteria are scored 0–4 points each (40 pts max). The composite score maps linearly to the multiple range. For indicative use only&nbsp;— not a formal appraisal.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER (matches site exactly) ══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__content">
+      <div>
+        <img src="https://pandocollective.com/pando-horizontal-charcoal.png"
+             alt="Pando Collective"
+             class="footer__logo-image"
+             onerror="this.src='/pando-horizontal-charcoal.png'">
+        <p class="footer__tagline">
+          Individual identity. Collective strength.<br>
+          Built to last generations.
+        </p>
+      </div>
+      <div>
+        <h4 class="footer__title">Company</h4>
+        <ul class="footer__links">
+          <li><a href="/about-us.html" class="footer__link">About Us</a></li>
+          <li><a href="/partner-with-us.html" class="footer__link">Partner With Us</a></li>
+          <li><a href="/property-management.html" class="footer__link">For Operators</a></li>
+          <li><a href="/contact-us.html" class="footer__link">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer__title">Connect</h4>
+        <ul class="footer__links">
+          <li><a href="#" class="footer__link">LinkedIn</a></li>
+          <li><a href="#" class="footer__link">Instagram</a></li>
+          <li><a href="#" class="footer__link">Twitter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      &copy; 2025 Pando Collective | <a href="#" style="color:inherit;">Privacy Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var MULT_LOW  = 1.25;
+  var MULT_HIGH = 1.75;
+  var MAX_PTS   = 32;
+
+  function scoreCommission(pct) {
+    if (pct <= 0)  return { pts: 0, label: "\u2014",   cls: "neutral" };
+    if (pct < 20)  return { pts: 0, label: "Poor",  cls: "poor" };
+    if (pct < 25)  return { pts: 1, label: "Ok",    cls: "ok" };
+    if (pct < 30)  return { pts: 2, label: "Fair",  cls: "fair" };
+    return               { pts: 4, label: "Good",  cls: "good" };
+  }
+
+  function scoreRPU(rpu) {
+    if (rpu <= 0)      return { pts: 0, label: "\u2014",         cls: "neutral" };
+    if (rpu < 10000)   return { pts: 0, label: "Weak",       cls: "poor" };
+    if (rpu < 15000)   return { pts: 1, label: "Below Avg",  cls: "ok" };
+    if (rpu < 25000)   return { pts: 2, label: "Average",    cls: "fair" };
+    if (rpu < 35000)   return { pts: 3, label: "Strong",     cls: "good" };
+    return                   { pts: 4, label: "Excellent",  cls: "excel" };
+  }
+
+  var RADIO_SCORE = {
+    poor:      { pts: 0, label: "Poor",      cls: "poor"    },
+    ok:        { pts: 1, label: "Ok",        cls: "ok"      },
+    fair:      { pts: 2, label: "Fair",      cls: "fair"    },
+    good:      { pts: 3, label: "Good",      cls: "good"    },
+    excellent: { pts: 4, label: "Excellent", cls: "excel"   }
+  };
+
+  function getRadio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : null;
+  }
+
+  function fmt(n) {
+    if (n >= 1000000) return "$" + (n / 1000000).toFixed(2) + "M";
+    if (n >= 1000)    return "$" + Math.round(n / 1000) + "K";
+    return "$" + Math.round(n).toLocaleString();
+  }
+
+  function fmtFull(n) {
+    return "$" + Math.round(n).toLocaleString();
+  }
+
+  function overallBand(pts) {
+    var r = pts / MAX_PTS;
+    if (r < 0.25) return { cls: "poor",  label: "Poor" };
+    if (r < 0.45) return { cls: "ok",    label: "Ok" };
+    if (r < 0.65) return { cls: "fair",  label: "Fair" };
+    if (r < 0.82) return { cls: "good",  label: "Good" };
+    return              { cls: "excel", label: "Excellent" };
+  }
+
+  var meterColor = {
+    poor:  "#B83232",
+    ok:    "#B07018",
+    fair:  "#A08000",
+    good:  "#2A6E48",
+    excel: "#1A5280"
+  };
+
+  function runValuation() {
+    var totalRent  = parseFloat(document.getElementById("totalRent").value)  || 0;
+    var units      = parseFloat(document.getElementById("units").value)       || 0;
+    var commission = parseFloat(document.getElementById("commission").value)  || 0;
+
+    // Revenue per unit
+    var rpu = (totalRent > 0 && units > 0) ? totalRent / units : 0;
+    var rpuEl = document.getElementById("revPerUnit");
+    if (rpu > 0) {
+      rpuEl.textContent = fmtFull(rpu) + " / unit";
+      rpuEl.classList.remove("empty");
+    } else {
+      rpuEl.textContent = "Enter rent & units above";
+      rpuEl.classList.add("empty");
+    }
+
+    // Commission badge
+    var cScore = scoreCommission(commission);
+    var badge  = document.getElementById("commBadge");
+    if (commission > 0) {
+      badge.innerHTML = 'Commission Quality: <span class="ibadge ib-' + cScore.cls + '">' + cScore.label + '</span>';
+    } else {
+      badge.innerHTML = "";
+    }
+
+    // Need rent + commission to show valuation
+    if (totalRent <= 0 || commission <= 0) {
+      document.getElementById("resultBody").innerHTML =
+        '<div class="placeholder">' +
+        '<img src="https://pandocollective.com/pando-leaf-gold.png" alt="">' +
+        'Enter the info on the left<br>to generate a valuation.' +
+        '</div>';
+      return;
+    }
+
+    var commRev  = totalRent * (commission / 100);
+    var rpuScore = scoreRPU(rpu);
+    var revTrend = RADIO_SCORE[getRadio("revTrend")]      || RADIO_SCORE.ok;
+    var assign   = RADIO_SCORE[getRadio("assignability")] || RADIO_SCORE.ok;
+    var ownerConc= RADIO_SCORE[getRadio("ownerConc")]     || RADIO_SCORE.good;
+    var opDep    = RADIO_SCORE[getRadio("opDep")]         || RADIO_SCORE.fair;
+    var notice   = RADIO_SCORE[getRadio("noticePeriod")]  || RADIO_SCORE.ok;
+    var channels = RADIO_SCORE[getRadio("channels")]      || RADIO_SCORE.fair;
+
+    var totalPts = cScore.pts + rpuScore.pts + revTrend.pts +
+                   assign.pts + ownerConc.pts + opDep.pts +
+                   notice.pts + channels.pts;
+
+    var multiple  = MULT_LOW + (totalPts / MAX_PTS) * (MULT_HIGH - MULT_LOW);
+    var valuation = commRev * multiple;
+    var valLow    = commRev * MULT_LOW;
+    var valHigh   = commRev * MULT_HIGH;
+    var meterPct  = (totalPts / MAX_PTS * 100).toFixed(1);
+    var band      = overallBand(totalPts);
+    var mc        = meterColor[band.cls];
+    var rpuDisplay = rpu > 0 ? fmtFull(rpu) + "/unit" : "\u2014";
+
+    var rpuRow = units > 0
+      ? '<div class="result-row"><span class="result-row__lbl">Revenue / Unit</span><span class="result-row__val">' + rpuDisplay + '</span></div>'
+      : "";
+
+    document.getElementById("resultBody").innerHTML =
+      '<div style="margin-bottom:1.25rem;">' +
+        '<div class="result-number">' + fmtFull(valuation) + '</div>' +
+        '<div class="result-multiple">' + multiple.toFixed(2) + '&times; commissionable revenue</div>' +
+        '<div class="result-range">Market range: ' + fmtFull(valLow) + ' &ndash; ' + fmtFull(valHigh) + '</div>' +
+      '</div>' +
+      '<div class="result-sep"></div>' +
+      '<div class="result-row"><span class="result-row__lbl">Gross Annual Rent</span><span class="result-row__val">' + fmtFull(totalRent) + '</span></div>' +
+      '<div class="result-row"><span class="result-row__lbl">Commissionable Revenue</span><span class="result-row__val">' + fmtFull(commRev) + '</span></div>' +
+      rpuRow +
+      '<div class="result-row"><span class="result-row__lbl">Quality Score</span><span class="result-row__val">' + totalPts + ' / ' + MAX_PTS + ' pts</span></div>' +
+      '<div class="meter-wrap">' +
+        '<div class="meter-labels"><span>1.25&times;</span><span>scored multiple</span><span>1.75&times;</span></div>' +
+        '<div class="meter-track"><div class="meter-fill" style="width:' + meterPct + '%; background:' + mc + ';"></div></div>' +
+      '</div>' +
+      '<div class="result-sep"></div>' +
+      '<div class="factor-section-lbl">Factor Breakdown</div>' +
+      '<div class="factor-grid">' +
+        '<div class="ftile ft-' + cScore.cls    + '"><div class="ftile__lbl">Commission Rate</div><div class="ftile__val">'    + commission + '% &mdash; ' + cScore.label    + '</div></div>' +
+        '<div class="ftile ft-' + rpuScore.cls  + '"><div class="ftile__lbl">Rev / Unit</div><div class="ftile__val">'         + rpuDisplay + ' &mdash; ' + rpuScore.label  + '</div></div>' +
+        '<div class="ftile ft-' + revTrend.cls  + '"><div class="ftile__lbl">Revenue Trend</div><div class="ftile__val">'      + revTrend.label  + '</div></div>' +
+        '<div class="ftile ft-' + assign.cls    + '"><div class="ftile__lbl">Assignability</div><div class="ftile__val">'      + assign.label    + '</div></div>' +
+        '<div class="ftile ft-' + ownerConc.cls + '"><div class="ftile__lbl">Owner Concentration</div><div class="ftile__val">'+ ownerConc.label + '</div></div>' +
+        '<div class="ftile ft-' + opDep.cls     + '"><div class="ftile__lbl">Operator Dependency</div><div class="ftile__val">'+ opDep.label     + '</div></div>' +
+        '<div class="ftile ft-' + notice.cls    + '"><div class="ftile__lbl">Contract Notice</div><div class="ftile__val">'    + notice.label    + '</div></div>' +
+        '<div class="ftile ft-' + channels.cls  + '"><div class="ftile__lbl">Channel Diversity</div><div class="ftile__val">' + channels.label  + '</div></div>' +
+      '</div>' +
+      '<div class="verdict v-' + band.cls + '">' +
+        '<div><div class="verdict__eyebrow">Overall Deal Quality</div><div class="verdict__label">' + band.label + '</div></div>' +
+        '<div><div class="verdict__mult-num">' + multiple.toFixed(2) + '&times;</div><div class="verdict__mult-sub">applied multiple</div></div>' +
+      '</div>';
+  }
+
+  // Nav mobile toggle
+  var toggle = document.querySelector(".nav__toggle");
+  var menu   = document.querySelector(".nav__menu");
+  if (toggle && menu) {
+    toggle.addEventListener("click", function() { menu.classList.toggle("active"); });
+    document.addEventListener("click", function(e) {
+      if (!e.target.closest(".nav__container")) menu.classList.remove("active");
+    });
+  }
+
+  runValuation();
+</script>
+</body>
+</html>
